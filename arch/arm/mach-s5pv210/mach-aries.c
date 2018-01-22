@@ -156,6 +156,9 @@ static int aries_notifier_call(struct notifier_block *this,
 	}
 	__raw_writel(mode, S5P_INFORM6);
 
+	/* Show logo.jpg on reboot instead of _charging.jpg when USB is connected. */
+	writel(0x12345678, S5P_INFORM5);
+
 	return NOTIFY_DONE;
 }
 
