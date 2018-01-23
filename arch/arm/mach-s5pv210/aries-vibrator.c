@@ -14,29 +14,30 @@
  *
  */
 
-#include <linux/hrtimer.h>
+#include <linux/clk.h>
+#include <linux/device.h>
 #include <linux/err.h>
 #include <linux/gpio.h>
+#include <linux/hrtimer.h>
+#include <linux/miscdevice.h>
+#include <linux/module.h>
+#include <linux/mutex.h>
 #include <linux/pwm.h>
 #include <linux/wakelock.h>
-#include <linux/mutex.h>
-#include <linux/clk.h>
 #include <linux/workqueue.h>
 
-#include <asm/mach-types.h>
-
-#include <../../../drivers/staging/android/timed_output.h>
-
+#include <mach/gpio.h>
 #include <mach/gpio-aries.h>
 
-#include <linux/device.h>
-#include <linux/miscdevice.h>
+#include <plat/gpio-cfg.h>
+
+#include <../../../drivers/staging/android/timed_output.h>
 
 #define GPD0_TOUT_1		2 << 4
 
 #ifdef CONFIG_SAMSUNG_VIBRANT
-#define PWM_PERIOD              (87084 / 2)
-#define PWM_DUTY_MAX            (87000 / 2)
+#define PWM_PERIOD		(87084 / 2)
+#define PWM_DUTY_MAX		(87000 / 2)
 #else
 #define PWM_PERIOD		(89284 / 2)
 #define PWM_DUTY_MAX		(87280 / 2)
@@ -111,13 +112,13 @@ static ssize_t aries_vibrator_set_duty(struct device *dev,
 }
 static ssize_t aries_vibrator_show_duty(struct device *dev,
 					struct device_attribute *attr,
-					const char *buf)
+					char *buf)
 {
 	return sprintf(buf, "%d", pwm_duty);
 }
 static DEVICE_ATTR(pwm_duty, S_IRUGO | S_IWUGO, aries_vibrator_show_duty, aries_vibrator_set_duty);
 static struct attribute *pwm_duty_attributes[] = {
-	&dev_attr_pwm_duty,
+	&dev_attr_pwm_duty.attr,
 	NULL
 };
 static struct attribute_group pwm_duty_group = {
@@ -149,10 +150,6 @@ static int __init aries_init_vibrator(void)
 {
 	int ret = 0;
 
-#ifdef CONFIG_MACH_ARIES
-	if (!machine_is_aries())
-		return 0;
-#endif
 	hrtimer_init(&vibdata.timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	vibdata.timer.function = aries_vibrator_timer_func;
 	INIT_WORK(&vibdata.work, aries_vibrator_work);
@@ -180,7 +177,7 @@ static int __init aries_init_vibrator(void)
 		printk("%s misc_register(%s) failed\n", __FUNCTION__, pwm_duty_device.name);
 	else {
 		if (sysfs_create_group(&pwm_duty_device.this_device->kobj, &pwm_duty_group))
-			dev_err("failed to create sysfs group for device %s\n", pwm_duty_device.name);
+			printk("failed to create sysfs group for device %s\n", pwm_duty_device.name);
 	}
 
 	return 0;
