@@ -1459,7 +1459,6 @@ static struct touchkey_platform_data touchkey_data = {
 	.keycode = touch_keypad_code,
 	.touchkey_onoff = touch_keypad_onoff,
 	.touchkey_sleep_onoff = touch_keypad_gpio_sleep,
-	.fw_name = "cypress-touchkey.bin",
 	.scl_pin = _3_TOUCH_SCL_28V,
 	.sda_pin = _3_TOUCH_SDA_28V,
 	.en_pin = _3_GPIO_TOUCH_EN,
