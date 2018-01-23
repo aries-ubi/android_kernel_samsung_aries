@@ -5518,6 +5518,15 @@ static void aries_init_gpio(void)
 	s3c_config_gpio_table();
 	s3c_config_sleep_gpio_table(ARRAY_SIZE(aries_sleep_gpio_table),
 			aries_sleep_gpio_table);
+#ifdef CONFIG_SAMSUNG_GALAXYS4G
+	if(is_telus_galaxys4g) {
+		s3c_config_sleep_gpio_table(ARRAY_SIZE(telus_galaxys4g_sleep_gpio_table),
+				telus_galaxys4g_sleep_gpio_table);
+	} else {
+		s3c_config_sleep_gpio_table(ARRAY_SIZE(tmobile_galaxys4g_sleep_gpio_table),
+				tmobile_galaxys4g_sleep_gpio_table);
+	}
+#endif
 }
 
 static void __init fsa9480_gpio_init(void)
